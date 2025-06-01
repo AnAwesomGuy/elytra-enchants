@@ -10,41 +10,40 @@ import net.minecraft.item.Items;
 import net.minecraft.util.Pair;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
-public class Trinkets
-{
-	public static float getElytraLaunchStrength(LivingEntity entity)
-	{
-		float strength = 0;
+import java.util.Optional;
 
-		TrinketComponent comp = TrinketsApi.getTrinketComponent(entity).get();
+public class Trinkets {
+    public static float getElytraLaunchStrength(LivingEntity entity) {
+		Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(entity);
+		if (component.isEmpty())
+			return 0F;
 
-		for (Pair<SlotReference, ItemStack> pair: comp.getEquipped(Items.ELYTRA))
-		{
-			MutableFloat mutableFloat = new MutableFloat(0.0F);
+		float strength = 0F;
 
-			EnchantmentHelper.forEachEnchantment(pair.getRight(), (enchantment, level) -> enchantment.value().modifyValue(Main.ELYTRA_LAUNCH_STRENGTH, entity.getRandom(), level, mutableFloat));
+        for (Pair<SlotReference, ItemStack> pair : component.get().getEquipped(Items.ELYTRA)) {
+            MutableFloat mutableFloat = new MutableFloat();
 
-			if (mutableFloat.floatValue() > strength)
-			{
-				strength = mutableFloat.floatValue();
-			}
-		}
+            EnchantmentHelper.forEachEnchantment(pair.getRight(), (enchantment, level) -> enchantment.value().modifyValue(ElytraEnchants.ELYTRA_LAUNCH_STRENGTH, entity.getRandom(), level, mutableFloat));
 
-		return strength;
-	}
+            if (mutableFloat.floatValue() > strength) {
+                strength = mutableFloat.floatValue();
+            }
+        }
 
-	public static boolean isElytraBounceOffFloor(LivingEntity entity)
-	{
-		TrinketComponent comp = TrinketsApi.getTrinketComponent(entity).get();
+        return strength;
+    }
 
-		for (Pair<SlotReference, ItemStack> pair: comp.getEquipped(Items.ELYTRA))
-		{
-			if (EnchantmentHelper.hasAnyEnchantmentsWith(pair.getRight(), Main.ELYTRA_BOUNCE_OFF_FLOOR))
-			{
-				return true;
-			}
-		}
+    public static boolean isElytraBounceOffFloor(LivingEntity entity) {
+		Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(entity);
+		if (component.isEmpty())
+			return false;
 
-		return false;
-	}
+        for (Pair<SlotReference, ItemStack> pair : component.get().getEquipped(Items.ELYTRA)) {
+            if (EnchantmentHelper.hasAnyEnchantmentsWith(pair.getRight(), ElytraEnchants.ELYTRA_BOUNCE_OFF_FLOOR)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -24,13 +24,12 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.chailotl.elytra_enchants.Main"
+          "com.chailotl.elytra_enchants.ElytraEnchants"
 		]
 	},
 	"mixins": [
 		"elytra_enchants.mixins.json"
 	],
-	"accessWidener": "elytra_enchants.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.15.11",
 		"minecraft": "~1.21",
