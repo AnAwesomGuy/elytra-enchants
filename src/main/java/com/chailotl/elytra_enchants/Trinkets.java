@@ -1,29 +1,28 @@
 package com.chailotl.elytra_enchants;
 
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.TrinketComponent;
-import dev.emi.trinkets.api.TrinketsApi;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Pair;
+
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotResult;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.Optional;
 
 public class Trinkets {
     public static float getElytraLaunchStrength(LivingEntity entity) {
-		Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(entity);
+		Optional<ICuriosItemHandler> component = CuriosApi.getCuriosInventory(entity);
 		if (component.isEmpty())
 			return 0F;
 
 		float strength = 0F;
 
-        for (Pair<SlotReference, ItemStack> pair : component.get().getEquipped(Items.ELYTRA)) {
+        for (SlotResult slot : component.get().findCurios(Items.ELYTRA)) {
             MutableFloat mutableFloat = new MutableFloat();
 
-            EnchantmentHelper.forEachEnchantment(pair.getRight(), (enchantment, level) -> enchantment.value().modifyValue(ElytraEnchants.ELYTRA_LAUNCH_STRENGTH, entity.getRandom(), level, mutableFloat));
+            EnchantmentHelper.runIterationOnItem(slot.stack(), (enchantment, level) -> enchantment.value().modifyUnfilteredValue(ElytraEnchants.ELYTRA_LAUNCH_STRENGTH.get(), entity.getRandom(), level, mutableFloat));
 
             if (mutableFloat.floatValue() > strength) {
                 strength = mutableFloat.floatValue();
@@ -34,12 +33,12 @@ public class Trinkets {
     }
 
     public static boolean isElytraBounceOffFloor(LivingEntity entity) {
-		Optional<TrinketComponent> component = TrinketsApi.getTrinketComponent(entity);
+		Optional<ICuriosItemHandler> component = CuriosApi.getCuriosInventory(entity);
 		if (component.isEmpty())
 			return false;
 
-        for (Pair<SlotReference, ItemStack> pair : component.get().getEquipped(Items.ELYTRA)) {
-            if (EnchantmentHelper.hasAnyEnchantmentsWith(pair.getRight(), ElytraEnchants.ELYTRA_BOUNCE_OFF_FLOOR)) {
+		for (SlotResult slot : component.get().findCurios(Items.ELYTRA)) {
+            if (EnchantmentHelper.has(slot.stack(), ElytraEnchants.ELYTRA_BOUNCE_OFF_FLOOR.get())) {
                 return true;
             }
         }
